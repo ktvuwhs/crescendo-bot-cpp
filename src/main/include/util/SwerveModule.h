@@ -34,7 +34,7 @@ class SwerveModule {
                std::string const canCoderBusName,
                int const turnPort,
                double const angleOffset,
-               bool const isInverted);
+               bool const isDriveInverted);
   void ZeroDriveMotor();
   void ZeroTurnMotor();
 

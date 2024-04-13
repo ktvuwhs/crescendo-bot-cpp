@@ -10,12 +10,12 @@ SwerveModule::SwerveModule(int const drivePort,
   std::string const canCoderBusName,
   int const turnPort,
   double const angleOffset,
-  bool const isInverted)
+  bool const isDriveInverted)
   : m_driveMotor{drivePort, driveBusName},
     m_canCoder{canCoderPort, canCoderBusName},
     m_turnMotor{turnPort, rev::CANSparkLowLevel::MotorType::kBrushless},
     m_turnEncoder{m_turnMotor.GetEncoder()} {
-      ConfigMotors(isInverted);
+      ConfigMotors(isDriveInverted);
       ConfigCANcoder(angleOffset);
       ZeroTurnMotor();
       ZeroDriveMotor();
