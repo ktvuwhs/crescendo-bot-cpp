@@ -5,9 +5,9 @@
 #include "util/SwerveModule.h"
 
 SwerveModule::SwerveModule(int const drivePort,
-  std::string const driveBusName,
+  std::string const &driveBusName,
   int const canCoderPort,
-  std::string const canCoderBusName,
+  std::string const &canCoderBusName,
   int const turnPort,
   double const angleOffset,
   bool const isDriveInverted)
@@ -36,13 +36,27 @@ void SwerveModule::ConfigMotors(bool const isDriveInverted) {
 
 void SwerveModule::ConfigDriveMotor(bool const isInverted) {
   configs::TalonFXConfiguration m_driveControllerCfg;
-  m_driveControllerCfg.CurrentLimits.SupplyCurrentLimitEnable = true;
-  m_driveControllerCfg.CurrentLimits.SupplyCurrentLimit = kDriveSupplyCurrentLimit;
-  m_driveControllerCfg.Feedback.SensorToMechanismRatio = kDriveGearRatio / kCircumference.value();
-  m_driveControllerCfg.MotorOutput.Inverted = isInverted ?
-    signals::InvertedValue::Clockwise_Positive
-    : signals::InvertedValue::CounterClockwise_Positive;
-    m_driveControllerCfg.MotorOutput.NeutralMode = signals::NeutralModeValue::Brake;
+  
+  // m_driveControllerCfg.CurrentLimits.SupplyCurrentLimitEnable = true;
+  // m_driveControllerCfg.CurrentLimits.SupplyCurrentLimit = kDriveSupplyCurrentLimit;
+  // m_driveControllerCfg.Feedback.SensorToMechanismRatio = kDriveGearRatio / kCircumference.value();
+  // m_driveControllerCfg.MotorOutput.Inverted = isInverted ?
+  //   signals::InvertedValue::Clockwise_Positive
+  //   : signals::InvertedValue::CounterClockwise_Positive;
+  //   m_driveControllerCfg.MotorOutput.NeutralMode = signals::NeutralModeValue::Brake;
+
+  m_driveControllerCfg.CurrentLimits
+    .WithSupplyCurrentLimitEnable(true)
+    .WithSupplyCurrentLimit(kDriveSupplyCurrentLimit);
+  
+  m_driveControllerCfg.Feedback
+    .WithSensorToMechanismRatio(kDriveGearRatio / kCircumference.value());
+
+  m_driveControllerCfg.MotorOutput
+    .WithInverted(isInverted ?
+      signals::InvertedValue::Clockwise_Positive
+      : signals::InvertedValue::CounterClockwise_Positive)
+    .WithNeutralMode(signals::NeutralModeValue::Brake);
   
   m_driveMotor.GetConfigurator().Apply(m_driveControllerCfg);
 }
@@ -57,9 +71,10 @@ void SwerveModule::ConfigTurnMotor(bool const isInverted) {
 
 void SwerveModule::ConfigCANcoder(double const angleOffset) {
   configs::CANcoderConfiguration m_cfg;
-  m_cfg.MagnetSensor.AbsoluteSensorRange = signals::AbsoluteSensorRangeValue::Signed_PlusMinusHalf;
-  m_cfg.MagnetSensor.SensorDirection = signals::SensorDirectionValue::CounterClockwise_Positive;
-  m_cfg.MagnetSensor.MagnetOffset = angleOffset;
+  m_cfg.MagnetSensor
+    .WithAbsoluteSensorRange(signals::AbsoluteSensorRangeValue::Signed_PlusMinusHalf)
+    .WithSensorDirection(signals::SensorDirectionValue::CounterClockwise_Positive)
+    .WithMagnetOffset(angleOffset);
 
   m_canCoder.GetConfigurator().Apply(m_cfg);
 }
