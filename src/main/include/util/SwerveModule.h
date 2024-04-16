@@ -29,9 +29,9 @@ using namespace units;
 class SwerveModule {
  public:
   SwerveModule(int const drivePort,
-               std::string const driveBusName,
+               std::string const &driveBusName,
                int const canCoderPort,
-               std::string const canCoderBusName,
+               std::string const &canCoderBusName,
                int const turnPort,
                double const angleOffset,
                bool const isDriveInverted);
