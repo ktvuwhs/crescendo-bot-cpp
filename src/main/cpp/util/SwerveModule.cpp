@@ -5,15 +5,15 @@
 #include "util/SwerveModule.h"
 
 SwerveModule::SwerveModule(int const drivePort,
-  std::string const &driveBusName,
-  int const canCoderPort,
-  std::string const &canCoderBusName,
-  int const turnPort,
-  double const angleOffset,
-  bool const isDriveInverted)
+                           int const turnPort,
+                           int const canCoderPort,
+                           double const angleOffset = 0.0,
+                           bool const isDriveInverted = false,
+                           std::string const &driveBusName = "rio",
+                           std::string const &canCoderBusName = "rio")
   : m_driveMotor{drivePort, driveBusName},
-    m_canCoder{canCoderPort, canCoderBusName},
     m_turnMotor{turnPort, rev::CANSparkLowLevel::MotorType::kBrushless},
+    m_canCoder{canCoderPort, canCoderBusName},
     m_turnEncoder{m_turnMotor.GetEncoder()} {
       ConfigMotors(isDriveInverted);
       ConfigCANcoder(angleOffset);
@@ -21,12 +21,8 @@ SwerveModule::SwerveModule(int const drivePort,
       ZeroDriveMotor();
 }
 
-void SwerveModule::ZeroDriveMotor() {
-  m_driveMotor.SetPosition(angle::turn_t{0});
-}
-
-void SwerveModule::ZeroTurnMotor() {
-  m_turnEncoder.SetPosition(GetAbsoluteNumTurns().value() * kTurnGearRatio);
+ctre::phoenix::StatusCode SwerveModule::ZeroDriveMotor() {
+  return m_driveMotor.SetPosition(angle::turn_t{0});
 }
 
 void SwerveModule::ConfigMotors(bool const isDriveInverted) {
@@ -53,8 +49,7 @@ void SwerveModule::ConfigDriveMotor(bool const isInverted) {
     .WithSensorToMechanismRatio(kDriveGearRatio / kCircumference.value());
 
   m_driveControllerCfg.MotorOutput
-    .WithInverted(isInverted ?
-      signals::InvertedValue::Clockwise_Positive
+    .WithInverted(isInverted ? signals::InvertedValue::Clockwise_Positive
       : signals::InvertedValue::CounterClockwise_Positive)
     .WithNeutralMode(signals::NeutralModeValue::Brake);
   
@@ -81,6 +76,10 @@ void SwerveModule::ConfigCANcoder(double const angleOffset) {
 
 angle::turn_t SwerveModule::GetAbsoluteNumTurns() {
   return m_canCoder.GetAbsolutePosition().GetValue();
+}
+
+rev::REVLibError SwerveModule::ZeroTurnMotor() {
+  return m_turnEncoder.SetPosition(GetAbsoluteNumTurns().value() * kTurnGearRatio);
 }
 
 angular_velocity::turns_per_second_t SwerveModule::GetDriveVelocity() {

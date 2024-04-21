@@ -28,20 +28,21 @@ using namespace units;
 
 class SwerveModule {
  public:
+  // Can default the bus name to "rio" for "roboRIO"
   SwerveModule(int const drivePort,
-               std::string const &driveBusName,
-               int const canCoderPort,
-               std::string const &canCoderBusName,
                int const turnPort,
-               double const angleOffset,
-               bool const isDriveInverted);
-  void ZeroDriveMotor();
-  void ZeroTurnMotor();
+               int const canCoderPort,
+               double const angleOffset = 0.0,
+               bool const isDriveInverted = false,
+               std::string const &driveBusName = "rio",
+               std::string const &canCoderBusName = "rio");
+  ctre::phoenix::StatusCode ZeroDriveMotor();
+  rev::REVLibError ZeroTurnMotor();
 
  private:
   hardware::TalonFX m_driveMotor;
-  hardware::CANcoder m_canCoder;
   rev::CANSparkMax m_turnMotor;
+  hardware::CANcoder m_canCoder;
   rev::SparkRelativeEncoder m_turnEncoder;
 
   void ConfigMotors(bool const isInverted);
