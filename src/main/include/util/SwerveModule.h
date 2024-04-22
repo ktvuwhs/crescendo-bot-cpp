@@ -10,6 +10,7 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 
 #include <frc/geometry/Rotation2d.h>
+#include <frc/kinematics/SwerveModuleState.h>
 #include <units/angle.h>
 
 #include <rev/CANSparkBase.h>
@@ -36,8 +37,8 @@ class SwerveModule {
                bool const isDriveInverted = false,
                std::string const &driveBusName = "rio",
                std::string const &canCoderBusName = "rio");
-  ctre::phoenix::StatusCode ZeroDriveMotor();
-  rev::REVLibError ZeroTurnMotor();
+  void SetDesiredState(frc::SwerveModuleState const &desiredState);
+  rev::REVLibError ZeroTurnEncoder();
 
  private:
   hardware::TalonFX m_driveMotor;
