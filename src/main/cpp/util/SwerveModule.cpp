@@ -4,6 +4,26 @@
 
 #include "util/SwerveModule.h"
 
+#include <string>
+
+// #include <frc/geometry/Rotation2d.h>
+#include <frc/kinematics/SwerveModuleState.h>
+#include <rev/CANSparkBase.h>
+#include <rev/CANSparkMax.h>
+#include <rev/CANSparkMaxLowLevel.h>
+#include <rev/SparkRelativeEncoder.h>
+#include <units/angle.h>
+#include <units/length.h>
+
+#include <ctre/phoenix6/CANcoder.hpp>
+#include <ctre/phoenix6/TalonFX.hpp>
+
+#include "../include/Constants.h"
+
+using namespace ctre::phoenix6;
+using namespace SwerveModuleConstants;
+using namespace units;
+
 SwerveModule::SwerveModule(int const drivePort,
                            int const turnPort,
                            int const canCoderPort,
