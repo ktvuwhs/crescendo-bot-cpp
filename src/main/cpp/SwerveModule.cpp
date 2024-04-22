@@ -16,6 +16,7 @@
 #include <units/angular_velocity.h>
 #include <units/length.h>
 
+#include <ctre/phoenix6/configs/Configs.hpp>
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
 
@@ -38,10 +39,20 @@ SwerveModule::SwerveModule(int const drivePort,
     m_turnMotor{turnPort, rev::CANSparkLowLevel::MotorType::kBrushless},
     m_canCoder{canCoderPort, canCoderBusName},
     m_turnEncoder{m_turnMotor.GetEncoder()} {
+      /** Deprecated for removal once Drivebase.cpp is implemented */
       ConfigMotors(isDriveInverted);
       ConfigCANcoder(angleOffset);
       ZeroTurnEncoder();
-      m_driveMotor.SetPosition(units::turn_t{0});
+      /** ******************************************************** */
+}
+
+void SwerveModule::ApplyConfigs(configs::TalonFXConfiguration const &motorCfg,
+                                configs::MagnetSensorConfigs &magnetCfg,
+                                double const angleOffset) {
+  m_driveMotor.GetConfigurator().Apply(motorCfg);
+  m_driveMotor.SetPosition(units::turn_t{0});
+  m_canCoder.GetConfigurator().Apply(magnetCfg.WithMagnetOffset(angleOffset));
+  ZeroTurnEncoder();
 }
 
 void SwerveModule::ConfigMotors(bool const isDriveInverted) {
@@ -65,6 +76,7 @@ void SwerveModule::ConfigDriveMotor(bool const isInverted) {
     .WithNeutralMode(signals::NeutralModeValue::Brake);
 
   m_driveMotor.GetConfigurator().Apply(m_driveControllerCfg);
+  m_driveMotor.SetPosition(units::turn_t{0});
 }
 
 void SwerveModule::ConfigTurnMotor(bool const isInverted) {

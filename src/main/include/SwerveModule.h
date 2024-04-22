@@ -17,6 +17,7 @@
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 
+#include <ctre/phoenix6/configs/Configs.hpp>
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
 
@@ -34,6 +35,11 @@ class SwerveModule {
                bool isDriveInverted = false,
                std::string const &driveBusName = "rio",
                std::string const &canCoderBusName = "rio");
+  
+  // For use in Drivebase.cpp to minimize object creation of configuration objects
+  void ApplyConfigs(ctre::phoenix6::configs::TalonFXConfiguration const &motorCfg,
+                    ctre::phoenix6::configs::MagnetSensorConfigs &magnetCfg,
+                    double angleOffset);
   void SetDesiredState(frc::SwerveModuleState const &desiredState);
   rev::REVLibError ZeroTurnEncoder();
 
@@ -43,10 +49,12 @@ class SwerveModule {
   ctre::phoenix6::hardware::CANcoder m_canCoder;
   rev::SparkRelativeEncoder m_turnEncoder;
 
+  /** Deprecated for removal */
   void ConfigMotors(bool isInverted);
   void ConfigDriveMotor(bool isDriveInverted);
-  void ConfigTurnMotor(bool isInverted);
   void ConfigCANcoder(double angleOffset);
+  /** ********************** */
+  void ConfigTurnMotor(bool isInverted);
   units::turn_t GetAbsoluteNumTurns();
   units::turns_per_second_t GetDriveVelocity();
 };
