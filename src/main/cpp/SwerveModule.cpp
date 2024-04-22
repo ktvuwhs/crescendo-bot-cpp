@@ -32,13 +32,14 @@ SwerveModule::SwerveModule(int const drivePort,
                            int const turnPort,
                            int const canCoderPort,
                            double const angleOffset,
-                           bool const isDriveInverted,
+                           bool const isDriveInverted,  // Deprecated for removal
                            std::string const &driveBusName,
                            std::string const &canCoderBusName)
   : m_driveMotor{drivePort, driveBusName},
     m_turnMotor{turnPort, rev::CANSparkLowLevel::MotorType::kBrushless},
     m_canCoder{canCoderPort, canCoderBusName},
     m_turnEncoder{m_turnMotor.GetEncoder()} {
+      ConfigTurnMotor(true);
       /** Deprecated for removal once Drivebase.cpp is implemented */
       ConfigMotors(isDriveInverted);
       ConfigCANcoder(angleOffset);

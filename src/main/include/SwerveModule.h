@@ -32,7 +32,7 @@ class SwerveModule {
                int turnPort,
                int canCoderPort,
                double angleOffset = 0.0,
-               bool isDriveInverted = false,
+               bool isDriveInverted = false,  // Deprecated for removal
                std::string const &driveBusName = "rio",
                std::string const &canCoderBusName = "rio");
   
