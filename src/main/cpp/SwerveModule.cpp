@@ -30,10 +30,10 @@ namespace signals = ctre::phoenix6::signals;
 SwerveModule::SwerveModule(int const drivePort,
                            int const turnPort,
                            int const canCoderPort,
-                           double const angleOffset = 0.0,
-                           bool const isDriveInverted = false,
-                           std::string const &driveBusName = "rio",
-                           std::string const &canCoderBusName = "rio")
+                           double const angleOffset,
+                           bool const isDriveInverted,
+                           std::string const &driveBusName,
+                           std::string const &canCoderBusName)
   : m_driveMotor{drivePort, driveBusName},
     m_turnMotor{turnPort, rev::CANSparkLowLevel::MotorType::kBrushless},
     m_canCoder{canCoderPort, canCoderBusName},
