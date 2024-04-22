@@ -14,14 +14,15 @@
 #include <rev/CANSparkMax.h>
 #include <rev/CANSparkMaxLowLevel.h>
 #include <rev/SparkRelativeEncoder.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
 
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
 
-#include "../include/Constants.h"
+#include "Constants.h"
 
-using namespace ctre::phoenix6;
-using namespace units;
+namespace util {
 
 class SwerveModule {
  public:
@@ -37,17 +38,18 @@ class SwerveModule {
   rev::REVLibError ZeroTurnEncoder();
 
  private:
-  hardware::TalonFX m_driveMotor;
+  ctre::phoenix6::hardware::TalonFX m_driveMotor;
   rev::CANSparkMax m_turnMotor;
-  hardware::CANcoder m_canCoder;
+  ctre::phoenix6::hardware::CANcoder m_canCoder;
   rev::SparkRelativeEncoder m_turnEncoder;
 
   void ConfigMotors(bool isInverted);
   void ConfigDriveMotor(bool isDriveInverted);
   void ConfigTurnMotor(bool isInverted);
   void ConfigCANcoder(double angleOffset);
-  angle::turn_t GetAbsoluteNumTurns();
-  angular_velocity::turns_per_second_t GetDriveVelocity();
+  units::turn_t GetAbsoluteNumTurns();
+  units::turns_per_second_t GetDriveVelocity();
 };
+} // namespace util
 
 #endif // #ifndef _UTIL_SWERVE_MODULE_H_
