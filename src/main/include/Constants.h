@@ -1,3 +1,7 @@
+#pragma once
+#ifndef _CONSTANTS_H_
+#define _CONSTANTS_H_
+
 #include <numbers>
 #include <units/length.h>
 
@@ -18,4 +22,6 @@ inline double constexpr kDriveSupplyCurrentLimit = 80.0;
 
 inline units::meter_t constexpr kWheelDiameter{0.1016};
 inline units::meter_t constexpr kCircumference{kWheelDiameter * std::numbers::pi_v<double>};
-} // SwerveModuleConstants
+} // namespace SwerveModuleConstants
+
+#endif  // #ifndef _CONSTANTS_H_
