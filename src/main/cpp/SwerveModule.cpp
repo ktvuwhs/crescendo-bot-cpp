@@ -100,7 +100,7 @@ void SwerveModule::SetDesiredState(frc::SwerveModuleState const &desiredState) {
   m_driveMotor.SetControl(
     m_VelDutyCycle.WithVelocity(
       // (m/s) * (wheel_turn / m) * (motor_turn / wheel_turn)
-      units::turns_per_second_t{optimizedState.speed.value() / SMConst::kCircumference.value() * SMConst::kDriveGearRatio}));
+      units::turns_per_second_t{optimizedState.speed.value() / SMConst::kCircumference.value()}));
   // (wheel_turns) * (motor_turn / wheel_turn) = motor_turn
   m_turnPIDController.SetReference(
     units::turn_t{optimizedState.angle.Radians()}.value() * SMConst::kTurnGearRatio,
