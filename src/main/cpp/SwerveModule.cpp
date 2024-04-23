@@ -39,12 +39,7 @@ SwerveModule::SwerveModule(int const drivePort,
     m_turnMotor{turnPort, rev::CANSparkLowLevel::MotorType::kBrushless},
     m_canCoder{canCoderPort, canCoderBusName},
     m_turnEncoder{m_turnMotor.GetEncoder()},
-    m_turnPIDController{m_turnMotor.GetPIDController()} {
-      // (motor_turn) * (wheel_turn / motor_turn) = wheel_turn
-      m_turnEncoder.SetPositionConversionFactor(1/SMConst::kTurnGearRatio);
-      m_turnPIDController.SetP(SMConst::kPTurn);
-      ConfigTurnMotor(true);
-}
+    m_turnPIDController{m_turnMotor.GetPIDController()} {}
 
 void SwerveModule::ApplyConfigs(configs::TalonFXConfiguration const &motorCfg,
                                 configs::MagnetSensorConfigs &magnetCfg) {
@@ -52,6 +47,12 @@ void SwerveModule::ApplyConfigs(configs::TalonFXConfiguration const &motorCfg,
   m_driveMotor.SetPosition(units::turn_t{0});
 
   m_canCoder.GetConfigurator().Apply(magnetCfg);
+
+  // (motor_turn) * (wheel_turn / motor_turn) = wheel_turn
+  m_turnEncoder.SetPositionConversionFactor(1/SMConst::kTurnGearRatio);
+  m_turnEncoder.SetVelocityConversionFactor(1/SMConst::kTurnGearRatio);
+  m_turnPIDController.SetP(SMConst::kPTurn);
+  ConfigTurnMotor(true);
   ZeroTurnEncoder();
 }
 
@@ -81,7 +82,7 @@ units::turn_t SwerveModule::GetAbsoluteNumTurns() {
 }
 
 rev::REVLibError SwerveModule::ZeroTurnEncoder() {
-  return m_turnEncoder.SetPosition(GetAbsoluteNumTurns().value() * SMConst::kTurnGearRatio);
+  return m_turnEncoder.SetPosition(GetAbsoluteNumTurns().value());
 }
 
 
@@ -103,7 +104,7 @@ void SwerveModule::SetDesiredState(frc::SwerveModuleState const &desiredState) {
       units::turns_per_second_t{optimizedState.speed.value() / SMConst::kCircumference.value()}));
   // (wheel_turns) * (motor_turn / wheel_turn) = motor_turn
   m_turnPIDController.SetReference(
-    units::turn_t{optimizedState.angle.Radians()}.value() * SMConst::kTurnGearRatio,
+    units::turn_t{optimizedState.angle.Radians()}.value(),
     rev::CANSparkLowLevel::ControlType::kPosition);
 }
 
