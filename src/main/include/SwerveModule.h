@@ -9,15 +9,18 @@
 #include <string>
 
 // #include <frc/geometry/Rotation2d.h>
+#include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <rev/CANSparkBase.h>
 #include <rev/CANSparkMax.h>
 #include <rev/CANSparkMaxLowLevel.h>
+#include <rev/SparkPIDController.h>
 #include <rev/SparkRelativeEncoder.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 
 #include <ctre/phoenix6/configs/Configs.hpp>
+#include <ctre/phoenix6/controls/VelocityDutyCycle.hpp>
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
 
@@ -31,15 +34,14 @@ class SwerveModule {
   SwerveModule(int drivePort,
                int turnPort,
                int canCoderPort,
-               double angleOffset = 0.0,
-               bool isDriveInverted = false,  // Deprecated for removal
                std::string const &driveBusName = "rio",
                std::string const &canCoderBusName = "rio");
   
   // For use in Drivebase.cpp to minimize object creation of configuration objects
   void ApplyConfigs(ctre::phoenix6::configs::TalonFXConfiguration const &motorCfg,
-                    ctre::phoenix6::configs::MagnetSensorConfigs &magnetCfg,
-                    double angleOffset);
+                    ctre::phoenix6::configs::MagnetSensorConfigs &magnetCfg);
+  frc::SwerveModulePosition GetPosition();
+  frc::SwerveModuleState GetState();
   void SetDesiredState(frc::SwerveModuleState const &desiredState);
   rev::REVLibError ZeroTurnEncoder();
 
@@ -48,15 +50,12 @@ class SwerveModule {
   rev::CANSparkMax m_turnMotor;
   ctre::phoenix6::hardware::CANcoder m_canCoder;
   rev::SparkRelativeEncoder m_turnEncoder;
+  rev::SparkPIDController m_turnPIDController;
+  ctre::phoenix6::controls::VelocityDutyCycle m_VelDutyCycle{units::turns_per_second_t{0.0}};
 
-  /** Deprecated for removal */
-  void ConfigMotors(bool isInverted);
-  void ConfigDriveMotor(bool isDriveInverted);
-  void ConfigCANcoder(double angleOffset);
-  /** ********************** */
   void ConfigTurnMotor(bool isInverted);
   units::turn_t GetAbsoluteNumTurns();
-  units::turns_per_second_t GetDriveVelocity();
+  // units::turns_per_second_t GetDriveVelocity();
 };
 } // namespace util
 
