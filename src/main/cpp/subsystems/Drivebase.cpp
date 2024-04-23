@@ -48,7 +48,7 @@ configs::TalonFXConfiguration Drivebase::GetTalonFXConfiguration(bool const isIn
     .WithSupplyCurrentLimit(SMConst::kDriveSupplyCurrentLimit);
 
   talonCfg.Feedback
-    .WithSensorToMechanismRatio(SMConst::kDriveGearRatio / SMConst::kCircumference.value());
+    .WithSensorToMechanismRatio(SMConst::kDriveGearRatio);
 
   talonCfg.MotorOutput
     .WithInverted(isInverted ? signals::InvertedValue::Clockwise_Positive
@@ -98,7 +98,7 @@ void Drivebase::Drive(double const xSpeed, double const ySpeed,
       frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeedLimited,
         ySpeedLimited,
         rotLimited,
-        frc::Rotation2d{units::turn_t{m_gyro.GetYaw()}}),
+        frc::Rotation2d{units::turn_t{-m_gyro.GetYaw()}}),  // NavX is CCW negative, when FRC is CCW positive
       period));
     states = &temp;
   } else {
