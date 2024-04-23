@@ -57,14 +57,14 @@ void SwerveModule::ApplyConfigs(configs::TalonFXConfiguration const &motorCfg,
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
   return frc::SwerveModulePosition{
-    m_driveMotor.GetPosition().GetValue().value() / SMConst::kDriveGearRatio * SMConst::kCircumference,
+    m_driveMotor.GetPosition().GetValue().value() * SMConst::kCircumference,
     frc::Rotation2d{units::turn_t{m_turnEncoder.GetPosition()}}};
 }
 
 frc::SwerveModuleState SwerveModule::GetState() {
   return frc::SwerveModuleState{
     units::meters_per_second_t{
-      m_driveMotor.GetVelocity().GetValue().value() / SMConst::kDriveGearRatio * SMConst::kCircumference.value()},
+      m_driveMotor.GetVelocity().GetValue().value() * SMConst::kCircumference.value()},
     frc::Rotation2d{units::turn_t{m_turnEncoder.GetPosition()}}};
 }
 
@@ -99,7 +99,8 @@ void SwerveModule::SetDesiredState(frc::SwerveModuleState const &desiredState) {
 
   m_driveMotor.SetControl(
     m_VelDutyCycle.WithVelocity(
-      units::turns_per_second_t{optimizedState.speed.value() / SMConst::kCircumference.value()}));
+      // (m/s) * (wheel_turn / m) * (motor_turn / wheel_turn)
+      units::turns_per_second_t{optimizedState.speed.value() / SMConst::kCircumference.value() * SMConst::kDriveGearRatio}));
   // (wheel_turns) * (motor_turn / wheel_turn) = motor_turn
   m_turnPIDController.SetReference(
     units::turn_t{optimizedState.angle.Radians()}.value() * SMConst::kTurnGearRatio,
