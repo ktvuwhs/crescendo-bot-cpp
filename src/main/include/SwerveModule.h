@@ -13,7 +13,7 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <rev/CANSparkBase.h>
 #include <rev/CANSparkMax.h>
-#include <rev/CANSparkMaxLowLevel.h>
+#include <rev/CANSparkLowLevel.h>
 #include <rev/SparkPIDController.h>
 #include <rev/SparkRelativeEncoder.h>
 #include <units/angle.h>
