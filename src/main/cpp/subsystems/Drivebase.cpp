@@ -92,32 +92,41 @@ void Drivebase::Drive(double const xSpeed, double const ySpeed,
     m_rotLimiter.Calculate(
       frc::ApplyDeadband(rot, DrivebaseConstants::kDeadband)) * DrivebaseConstants::kMaxAngularSpeed;
 
-  wpi::array<frc::SwerveModuleState, 4> *states;
-  if (fieldRelative) {
-    wpi::array<frc::SwerveModuleState, 4> temp = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
+  wpi::array<frc::SwerveModuleState, 4> states = fieldRelative ?
+    m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
       frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeedLimited,
         ySpeedLimited,
         rotLimited,
         frc::Rotation2d{units::turn_t{-m_gyro.GetYaw()}}),  // NavX is CCW negative, when FRC is CCW positive
-      period));
-    states = &temp;
-  } else {
-    wpi::array<frc::SwerveModuleState, 4> temp = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
-      frc::ChassisSpeeds{xSpeedLimited, ySpeedLimited, rotLimited},
-      period));
-    states = &temp;
-  }
+        period))
+      : m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
+          frc::ChassisSpeeds{xSpeedLimited, ySpeedLimited, rotLimited},
+          period));
+  // if (fieldRelative) {
+  //   wpi::array<frc::SwerveModuleState, 4> temp = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
+  //     frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeedLimited,
+  //       ySpeedLimited,
+  //       rotLimited,
+  //       frc::Rotation2d{units::turn_t{-m_gyro.GetYaw()}}),  // NavX is CCW negative, when FRC is CCW positive
+  //     period));
+  //   states = &temp;
+  // } else {
+  //   wpi::array<frc::SwerveModuleState, 4> temp = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
+  //     frc::ChassisSpeeds{xSpeedLimited, ySpeedLimited, rotLimited},
+  //     period));
+  //   states = &temp;
+  // }
 
   // According to WPILib, module states are not normalized, and user input can cause module speeds to go
   // above attainable max velocity.  Desaturating wheel speeds will fix this issue.  Desaturating the
   // wheel speeds makes sure all module speeds are at or below the maximum speed while maintaining the
   // ratio of speeds between modules.
-  m_kinematics.DesaturateWheelSpeeds(states, DrivebaseConstants::kMaxSpeed);
+  m_kinematics.DesaturateWheelSpeeds(&states, DrivebaseConstants::kMaxSpeed);
   
-  m_modules[0].SetDesiredState(states->at(0));
-  m_modules[1].SetDesiredState(states->at(1));
-  m_modules[2].SetDesiredState(states->at(2));
-  m_modules[3].SetDesiredState(states->at(3));
+  m_modules[0].SetDesiredState(states[0]);
+  m_modules[1].SetDesiredState(states[1]);
+  m_modules[2].SetDesiredState(states[2]);
+  m_modules[3].SetDesiredState(states[3]);
 }
 
 frc2::CommandPtr Drivebase::GetResetHeadingCmd() {
