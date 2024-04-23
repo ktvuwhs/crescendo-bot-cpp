@@ -32,7 +32,7 @@ inline double constexpr kPTurn = 0.5;
 inline units::meter_t constexpr kWheelbase = 24_in;
 inline units::meter_t constexpr kTrackwidth = 24_in;
 inline units::meter_t constexpr kWheelDiameter{0.1016};
-inline units::meter_t constexpr kCircumference{kWheelDiameter * std::numbers::pi_v<double>};
+inline units::meter_t const kCircumference = kWheelDiameter * std::numbers::pi_v<double>;
 
 inline int constexpr kBotRightDrivePort = 3;
 inline int constexpr kBotLeftDrivePort = 1;
