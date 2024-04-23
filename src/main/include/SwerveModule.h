@@ -55,7 +55,6 @@ class SwerveModule {
 
   void ConfigTurnMotor(bool isInverted);
   units::turn_t GetAbsoluteNumTurns();
-  // units::turns_per_second_t GetDriveVelocity();
 };
 } // namespace util
 
