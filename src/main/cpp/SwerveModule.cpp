@@ -57,6 +57,8 @@ void SwerveModule::ConfigTurnMotor(bool const isInverted) {
   m_turnMotor.SetSmartCurrentLimit(SMConst::kStallLimit, SMConst::kFreeLimit);
   // (motor_turn) * (wheel_turn / motor_turn) = wheel_turn
   m_turnEncoder.SetPositionConversionFactor(1/SMConst::kTurnGearRatio);
+  // TODO: update velocity conversion factor after it has been tested on the robot
+  m_turnEncoder.SetVelocityConversionFactor(1/SMConst::kTurnGearRatio);
   m_turnPIDController.SetP(SMConst::kPTurn);
   m_turnMotor.BurnFlash();
 }
