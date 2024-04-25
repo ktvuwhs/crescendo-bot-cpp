@@ -45,15 +45,24 @@ void SwerveModule::ApplyConfigs(configs::TalonFXConfiguration const &motorCfg,
                                 configs::MagnetSensorConfigs &magnetCfg) {
   m_driveMotor.GetConfigurator().Apply(motorCfg);
   m_driveMotor.SetPosition(units::turn_t{0});
-
   m_canCoder.GetConfigurator().Apply(magnetCfg);
-
-  // (motor_turn) * (wheel_turn / motor_turn) = wheel_turn
-  m_turnEncoder.SetPositionConversionFactor(1/SMConst::kTurnGearRatio);
-  m_turnEncoder.SetVelocityConversionFactor(1/SMConst::kTurnGearRatio);
-  m_turnPIDController.SetP(SMConst::kPTurn);
   ConfigTurnMotor(true);
   ZeroTurnEncoder();
+}
+
+void SwerveModule::ConfigTurnMotor(bool const isInverted) {
+  m_turnMotor.RestoreFactoryDefaults();
+  m_turnMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+  m_turnMotor.SetInverted(isInverted);
+  m_turnMotor.SetSmartCurrentLimit(SMConst::kStallLimit, SMConst::kFreeLimit);
+  // (motor_turn) * (wheel_turn / motor_turn) = wheel_turn
+  m_turnEncoder.SetPositionConversionFactor(1/SMConst::kTurnGearRatio);
+  m_turnPIDController.SetP(SMConst::kPTurn);
+  m_turnMotor.BurnFlash();
+}
+
+rev::REVLibError SwerveModule::ZeroTurnEncoder() {
+  return m_turnEncoder.SetPosition(GetAbsoluteNumTurns().value());
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
@@ -69,22 +78,9 @@ frc::SwerveModuleState SwerveModule::GetState() {
     frc::Rotation2d{units::turn_t{m_turnEncoder.GetPosition()}}};
 }
 
-void SwerveModule::ConfigTurnMotor(bool const isInverted) {
-  m_turnMotor.RestoreFactoryDefaults();
-  m_turnMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
-  m_turnMotor.SetInverted(isInverted);
-  m_turnMotor.SetSmartCurrentLimit(SMConst::kStallLimit, SMConst::kFreeLimit);
-  m_turnMotor.BurnFlash();
-}
-
 units::turn_t SwerveModule::GetAbsoluteNumTurns() {
   return m_canCoder.GetAbsolutePosition().GetValue();
 }
-
-rev::REVLibError SwerveModule::ZeroTurnEncoder() {
-  return m_turnEncoder.SetPosition(GetAbsoluteNumTurns().value());
-}
-
 
 void SwerveModule::SetDesiredState(frc::SwerveModuleState const &desiredState) {
   frc::Rotation2d currAngle = frc::Rotation2d{units::turn_t{m_turnEncoder.GetPosition()}};
