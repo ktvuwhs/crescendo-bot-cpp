@@ -21,18 +21,20 @@ namespace SwerveModuleConstants {
 inline double constexpr kDriveGearRatio = 5.9028;     // (50/16) * (17/27) * (45/15)
 inline double constexpr kTurnGearRatio = 150.0 / 7.0; // 12.8
 
-inline unsigned int constexpr kStallLimit = 40;
-inline unsigned int constexpr kFreeLimit = 40;
-inline double constexpr kDriveSupplyCurrentLimit = 80.0;
-inline double constexpr kPDrive = 0.5;
-inline double constexpr kDDrive = 0.001;
-inline double constexpr kVDrive = 0.0001;
-inline double constexpr kPTurn = 0.5;
-
 inline units::meter_t constexpr kWheelbase = 24_in;
 inline units::meter_t constexpr kTrackwidth = 24_in;
 inline units::meter_t constexpr kWheelDiameter{0.1016};
 inline units::meter_t const kCircumference = kWheelDiameter * std::numbers::pi_v<double>;
+
+inline unsigned int constexpr kStallLimit = 40;
+inline unsigned int constexpr kFreeLimit = 40;
+inline double constexpr kDriveSupplyCurrentLimit = 80.0;
+// TODO: Re-tune kP value
+inline double constexpr kPDrive = 0.5 * kCircumference.value();
+inline double constexpr kDDrive = 0.001;
+inline double constexpr kVDrive = 0.0001;
+// TODO: Re-tune kP value
+inline double constexpr kPTurn = 0.5 * kTurnGearRatio;
 
 inline int constexpr kBotRightDrivePort = 3;
 inline int constexpr kBotLeftDrivePort = 1;
@@ -56,12 +58,12 @@ inline double constexpr kTopLeftMagnetOffset = 0.019287;
 } // namespace SwerveModuleConstants
 
 namespace DrivebaseConstants {
-inline constexpr units::hertz_t kXSlewRate{3/1_s};
-inline constexpr units::hertz_t kYSlewRate{3/1_s};
-inline constexpr units::hertz_t kRotSlewRate{3/1_s};
+inline constexpr units::hertz_t kXSlewRate{1.8/1_s};
+inline constexpr units::hertz_t kYSlewRate{1.8/1_s};
+inline constexpr units::hertz_t kRotSlewRate{2/1_s};
 inline constexpr double kDeadband = 0.02;
-static units::meters_per_second_t constexpr kMaxSpeed = 3.0_mps;
-static units::radians_per_second_t constexpr kMaxAngularSpeed = units::radians_per_second_t{std::numbers::pi};
+static units::meters_per_second_t constexpr kMaxSpeed = 6.0_mps;
+static units::radians_per_second_t constexpr kMaxAngularSpeed = units::radians_per_second_t{2*std::numbers::pi};
 } // namespace DrivebaseConstants
 
 #endif  // #ifndef _CONSTANTS_H_
