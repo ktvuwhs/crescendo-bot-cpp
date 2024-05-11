@@ -49,7 +49,7 @@ configs::TalonFXConfiguration Drivebase::GetTalonFXConfiguration(bool const isIn
     .WithSupplyCurrentLimit(SMConst::kDriveSupplyCurrentLimit);
 
   talonCfg.Feedback
-    .WithSensorToMechanismRatio(SMConst::kDriveGearRatio);
+    .WithSensorToMechanismRatio(SMConst::kDriveGearRatio / SMConst::kCircumference);
 
   talonCfg.MotorOutput
     .WithInverted(isInverted ? signals::InvertedValue::Clockwise_Positive

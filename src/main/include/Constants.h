@@ -30,7 +30,7 @@ inline unsigned int constexpr kStallLimit = 40;
 inline unsigned int constexpr kFreeLimit = 40;
 inline double constexpr kDriveSupplyCurrentLimit = 80.0;
 // TODO: Re-tune kP value
-inline double constexpr kPDrive = 0.5 * kCircumference.value();
+inline double constexpr kPDrive = 0.5;
 inline double constexpr kDDrive = 0.001;
 inline double constexpr kVDrive = 0.0001;
 // TODO: Re-tune kP value
