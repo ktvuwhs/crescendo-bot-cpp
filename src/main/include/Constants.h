@@ -62,8 +62,8 @@ inline constexpr units::hertz_t kXSlewRate{1.8/1_s};
 inline constexpr units::hertz_t kYSlewRate{1.8/1_s};
 inline constexpr units::hertz_t kRotSlewRate{2/1_s};
 inline constexpr double kDeadband = 0.02;
-static units::meters_per_second_t constexpr kMaxSpeed = 6.0_mps;
-static units::radians_per_second_t constexpr kMaxAngularSpeed = units::radians_per_second_t{2*std::numbers::pi};
+inline units::meters_per_second_t constexpr kMaxSpeed = 6.0_mps;
+inline units::radians_per_second_t constexpr kMaxAngularSpeed = units::radians_per_second_t{2*std::numbers::pi};
 } // namespace DrivebaseConstants
 
 #endif  // #ifndef _CONSTANTS_H_
