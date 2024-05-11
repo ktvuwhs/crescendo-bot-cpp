@@ -56,8 +56,13 @@ void SwerveModule::ConfigTurnMotor(bool const isInverted) {
   m_turnMotor.SetInverted(isInverted);
   m_turnMotor.SetSmartCurrentLimit(SMConst::kStallLimit, SMConst::kFreeLimit);
   // (motor_turn) * (wheel_turn / motor_turn) = wheel_turn
-  m_turnEncoder.SetPositionConversionFactor(1/SMConst::kTurnGearRatio);
+  m_turnEncoder.SetPositionConversionFactor(1/SMConst::kTurnGearRatio * 2 * std::numbers::pi);
+  m_turnEncoder.SetVelocityConversionFactor(1/SMConst::kTurnGearRatio * 2 * std::numbers::pi / 60);
+  m_turnPIDController.SetPositionPIDWrappingEnabled(true);
+  m_turnPIDController.SetPositionPIDWrappingMinInput(0);
+  m_turnPIDController.SetPositionPIDWrappingMaxInput(1/SMConst::kTurnGearRatio * 2 * std::numbers::pi);
   m_turnPIDController.SetP(SMConst::kPTurn);
+  m_turnPIDController.SetOutputRange(-1, 1);
   m_turnMotor.BurnFlash();
 }
 
@@ -67,15 +72,15 @@ rev::REVLibError SwerveModule::ZeroTurnEncoder() {
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
   return frc::SwerveModulePosition{
-    m_driveMotor.GetPosition().GetValue().value() * SMConst::kCircumference,
+    m_driveMotor.GetPosition().GetValue(),
     frc::Rotation2d{units::turn_t{m_turnEncoder.GetPosition()}}};
 }
 
 frc::SwerveModuleState SwerveModule::GetState() {
   return frc::SwerveModuleState{
     units::meters_per_second_t{
-      m_driveMotor.GetVelocity().GetValue().value() * SMConst::kCircumference.value()},
-    frc::Rotation2d{units::turn_t{m_turnEncoder.GetPosition()}}};
+      m_driveMotor.GetVelocity().GetValue().value()},
+    frc::Rotation2d{units::radian_t{m_turnEncoder.GetPosition()}}};
 }
 
 units::turn_t SwerveModule::GetAbsoluteNumTurns() {
@@ -83,7 +88,7 @@ units::turn_t SwerveModule::GetAbsoluteNumTurns() {
 }
 
 void SwerveModule::SetDesiredState(frc::SwerveModuleState const &desiredState) {
-  frc::Rotation2d currAngle = frc::Rotation2d{units::turn_t{m_turnEncoder.GetPosition()}};
+  frc::Rotation2d currAngle = frc::Rotation2d{units::radian_t{m_turnEncoder.GetPosition()}};
   frc::SwerveModuleState optimizedState = frc::SwerveModuleState::Optimize(desiredState, currAngle);
 
   // Scale speed by cosine of angle error. This scales down movement
@@ -97,10 +102,10 @@ void SwerveModule::SetDesiredState(frc::SwerveModuleState const &desiredState) {
   m_driveMotor.SetControl(
     m_VelDutyCycle.WithVelocity(
       // (m/s) * (wheel_turn / m) * (motor_turn / wheel_turn)
-      units::turns_per_second_t{optimizedState.speed.value() / SMConst::kCircumference.value()}));
+      units::turns_per_second_t{optimizedState.speed.value()}));
   // (wheel_turns) * (motor_turn / wheel_turn) = motor_turn
   m_turnPIDController.SetReference(
-    units::turn_t{optimizedState.angle.Radians()}.value(),
+    optimizedState.angle.Radians().value(),
     rev::CANSparkLowLevel::ControlType::kPosition);
 }
 
